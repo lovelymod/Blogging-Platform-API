@@ -10,7 +10,7 @@ type Handlers struct {
 	BlogHandler *handler.BlogHandler
 }
 
-func SetupRouter(r *gin.Engine, h *Handlers) {
+func SetupRoutes(r *gin.Engine, h *Handlers) {
 	// Public Routes
 	r.POST("/blog", h.BlogHandler.Create)
 

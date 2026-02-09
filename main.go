@@ -4,7 +4,7 @@ import (
 	"blogging-platform-api/internal/bootstrap"
 	"blogging-platform-api/internal/delivery/routes"
 	"blogging-platform-api/internal/delivery/routes/handler"
-	"blogging-platform-api/internal/repository/postgress"
+	"blogging-platform-api/internal/repository"
 	"blogging-platform-api/internal/usecase"
 	"time"
 
@@ -17,7 +17,7 @@ func main() {
 	app := bootstrap.App() // โหลด DB/Config มาไว้ในตัวแปรเดียว
 
 	// สร้าง Layer ต่างๆ
-	blogRepo := postgress.NewBlogRepository(app.DB)
+	blogRepo := repository.NewBlogRepository(app.DB)
 	blogUsecase := usecase.NewBlogUsecase(blogRepo, time.Second*2)
 
 	h := &routes.Handlers{
@@ -27,7 +27,7 @@ func main() {
 	r := gin.Default()
 
 	// เรียกใช้ router.go เพื่อเชื่อมโยงเส้นทาง
-	routes.SetupRouter(r, h)
+	routes.SetupRoutes(r, h)
 
 	r.Run(":8080")
 }

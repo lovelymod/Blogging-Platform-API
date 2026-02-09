@@ -1,4 +1,4 @@
-package postgress
+package repository
 
 import (
 	"blogging-platform-api/internal/entity"
