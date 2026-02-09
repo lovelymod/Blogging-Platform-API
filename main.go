@@ -1,17 +1,33 @@
 package main
 
 import (
-	"net/http"
+	"blogging-platform-api/internal/bootstrap"
+	"blogging-platform-api/internal/delivery/routes"
+	"blogging-platform-api/internal/delivery/routes/handler"
+	"blogging-platform-api/internal/repository/postgress"
+	"blogging-platform-api/internal/usecase"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	router := gin.Default()
-	router.GET("/proza888", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "เมื่อไหร่จะไปนวดกระปู๋สักที",
-		})
-	})
-	router.Run(":8080")
+	gin.SetMode(gin.ReleaseMode)
+
+	app := bootstrap.App() // โหลด DB/Config มาไว้ในตัวแปรเดียว
+
+	// สร้าง Layer ต่างๆ
+	blogRepo := postgress.NewBlogRepository(app.DB)
+	blogUsecase := usecase.NewBlogUsecase(blogRepo, time.Second*2)
+
+	h := &routes.Handlers{
+		BlogHandler: &handler.BlogHandler{Usecase: blogUsecase},
+	}
+
+	r := gin.Default()
+
+	// เรียกใช้ router.go เพื่อเชื่อมโยงเส้นทาง
+	routes.SetupRouter(r, h)
+
+	r.Run(":8080")
 }

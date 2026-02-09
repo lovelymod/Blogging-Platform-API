@@ -1,2 +1,6 @@
 # air tmp folder
 tmp
+
+.env
+
+.air.*
