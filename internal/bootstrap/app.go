@@ -23,6 +23,6 @@ func App() Application {
 	app := &Application{}
 	app.DB = SetupDatabase() // เรียกฟังก์ชันจาก database.go
 
-	app.CorsConfig = cors.New(cors.DefaultConfig())
+	app.CorsConfig = cors.Default()
 	return *app
 }

@@ -15,8 +15,10 @@ type Blog struct {
 
 type BlogRepository interface {
 	Create(ctx context.Context, blog *Blog) error
+	GetAll(ctx context.Context) ([]Blog, error)
 }
 
 type BlogUsecase interface {
 	Create(ctx context.Context, blog *Blog) error
+	GetAll(ctx context.Context) ([]Blog, error)
 }

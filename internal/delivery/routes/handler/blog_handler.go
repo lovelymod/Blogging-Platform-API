@@ -19,9 +19,33 @@ func (h *BlogHandler) Create(c *gin.Context) {
 	}
 
 	if err := h.Usecase.Create(c.Request.Context(), &blog); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, &entity.Resp{
+			Message: err.Error(),
+			Success: false,
+		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, blog)
+	c.JSON(http.StatusCreated, &entity.Resp{
+		Data:    blog,
+		Success: true,
+	})
+}
+
+func (h *BlogHandler) GetAll(c *gin.Context) {
+	blogs, err := h.Usecase.GetAll(c.Request.Context())
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &entity.Resp{
+			Message: err.Error(),
+			Success: false,
+		})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, &entity.Resp{
+		Data:    blogs,
+		Success: true,
+	})
 }

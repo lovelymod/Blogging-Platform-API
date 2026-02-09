@@ -20,3 +20,13 @@ func NewBlogRepository(db *gorm.DB) entity.BlogRepository {
 func (repo *blogRepository) Create(ctx context.Context, blog *entity.Blog) error {
 	return repo.db.WithContext(ctx).Create(blog).Error
 }
+
+func (repo *blogRepository) GetAll(ctx context.Context) ([]entity.Blog, error) {
+	var blogs []entity.Blog
+
+	if err := repo.db.WithContext(ctx).Find(&blogs).Error; err != nil {
+		return nil, err
+	}
+
+	return blogs, nil
+}

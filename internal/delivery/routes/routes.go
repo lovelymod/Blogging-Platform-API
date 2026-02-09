@@ -13,6 +13,7 @@ type Handlers struct {
 func SetupRoutes(r *gin.Engine, h *Handlers) {
 	// Public Routes
 	r.POST("/blog", h.BlogHandler.Create)
+	r.GET("/blogs", h.BlogHandler.GetAll)
 
 	// Protected Routes (ตัวอย่างถ้ามี Middleware)
 	// api.Use(middleware.AuthMiddleware()).POST("/blogs", blogHandler.Create)
