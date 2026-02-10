@@ -32,16 +32,20 @@ func (u *blogUsecase) GetByID(ctx context.Context, id uint) (*entity.Blog, error
 	return u.repo.GetByID(ctx, id)
 }
 
-func (u *blogUsecase) Create(ctx context.Context, blog *entity.Blog) error {
+func (u *blogUsecase) Create(ctx context.Context, blog *entity.Blog) (*entity.Blog, error) {
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
+
+	// Tags ID Must be unique
 
 	return u.repo.Create(ctx, blog)
 }
 
-func (u *blogUsecase) Update(ctx context.Context, id uint, updateBlog *entity.Blog) error {
+func (u *blogUsecase) Update(ctx context.Context, id uint, updateBlog *entity.Blog) (*entity.Blog, error) {
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
+
+	// Tags ID Must be unique
 
 	return u.repo.Update(ctx, id, updateBlog)
 }

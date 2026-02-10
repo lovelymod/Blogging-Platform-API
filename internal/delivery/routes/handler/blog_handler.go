@@ -79,7 +79,9 @@ func (h *BlogHandler) Create(c *gin.Context) {
 		Tags:     tags,
 	}
 
-	if err := h.Usecase.Create(c.Request.Context(), &blog); err != nil {
+	createdBlog, err := h.Usecase.Create(c.Request.Context(), &blog)
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
@@ -88,7 +90,7 @@ func (h *BlogHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, &entity.Resp{
-		Data:    blog,
+		Data:    createdBlog,
 		Success: true,
 	})
 }
@@ -117,14 +119,16 @@ func (h *BlogHandler) Update(c *gin.Context) {
 		tags = append(tags, entity.Tag{ID: v})
 	}
 
-	updateBlog := entity.Blog{
+	updatedData := entity.Blog{
 		Title:    req.Title,
 		Content:  req.Content,
 		Category: req.Category,
 		Tags:     tags,
 	}
 
-	if err := h.Usecase.Update(c.Request.Context(), uint(blogID), &updateBlog); err != nil {
+	updatedBlog, err := h.Usecase.Update(c.Request.Context(), uint(blogID), &updatedData)
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
@@ -133,7 +137,7 @@ func (h *BlogHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, &entity.Resp{
-		Data:    updateBlog,
+		Data:    updatedBlog,
 		Success: true,
 	})
 }
