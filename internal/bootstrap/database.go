@@ -4,19 +4,18 @@ import (
 	"blogging-platform-api/internal/entity"
 	"fmt"
 	"log"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func SetupDatabase() *gorm.DB {
+func SetupDatabase(env *ENV) *gorm.DB {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		os.Getenv("SUPABASE_HOST"),
-		os.Getenv("SUPABASE_USER"),
-		os.Getenv("SUPABASE_PASSWORD"),
-		os.Getenv("SUPABASE_DB"),
-		os.Getenv("SUPABASE_PORT"),
+		env.SUPABASE_HOST,
+		env.SUPABASE_USER,
+		env.SUPABASE_PASSWORD,
+		env.SUPABASE_DB,
+		env.SUPABASE_PORT,
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 

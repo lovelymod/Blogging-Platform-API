@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type ENV struct {
+	SUPABASE_HOST     string
+	SUPABASE_USER     string
+	SUPABASE_PASSWORD string
+	SUPABASE_DB       string
+	SUPABASE_PORT     string
+}
+
 type Application struct {
 	DB         *gorm.DB
+	ENV        *ENV
 	CorsConfig gin.HandlerFunc
 }
 
@@ -20,8 +30,18 @@ func App() Application {
 		log.Fatal("Error loading .env file")
 	}
 
-	app := &Application{}
-	app.DB = SetupDatabase() // เรียกฟังก์ชันจาก database.go
+	env := &ENV{
+		SUPABASE_HOST:     os.Getenv("SUPABASE_HOST"),
+		SUPABASE_USER:     os.Getenv("SUPABASE_USER"),
+		SUPABASE_PASSWORD: os.Getenv("SUPABASE_PASSWORD"),
+		SUPABASE_DB:       os.Getenv("SUPABASE_DB"),
+		SUPABASE_PORT:     os.Getenv("SUPABASE_PORT"),
+	}
+
+	app := &Application{
+		ENV: env,
+	}
+	app.DB = SetupDatabase(env) // เรียกฟังก์ชันจาก database.go
 
 	app.CorsConfig = cors.Default()
 	return *app

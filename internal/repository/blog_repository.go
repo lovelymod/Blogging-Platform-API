@@ -30,7 +30,7 @@ func (repo *blogRepository) GetAll(ctx context.Context) ([]entity.Blog, error) {
 func (repo *blogRepository) GetByID(ctx context.Context, id uint) (*entity.Blog, error) {
 	var blog entity.Blog
 
-	if err := repo.db.WithContext(ctx).Where(&entity.Blog{ID: id}).First(&blog).Error; err != nil {
+	if err := repo.db.WithContext(ctx).First(&blog, id).Error; err != nil {
 		return nil, err
 	}
 

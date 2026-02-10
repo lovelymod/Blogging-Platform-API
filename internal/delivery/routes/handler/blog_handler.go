@@ -59,7 +59,10 @@ func (h *BlogHandler) GetByID(c *gin.Context) {
 func (h *BlogHandler) Create(c *gin.Context) {
 	var blog entity.Blog
 	if err := c.ShouldBindJSON(&blog); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, &entity.Resp{
+			Message: err.Error(),
+			Success: false,
+		})
 		return
 	}
 
@@ -86,10 +89,14 @@ func (h *BlogHandler) Update(c *gin.Context) {
 		})
 		return
 	}
+
 	var updateBlog entity.UpdateBlogRequest
 
 	if err := c.ShouldBindJSON(&updateBlog); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, &entity.Resp{
+			Message: err.Error(),
+			Success: false,
+		})
 		return
 	}
 
