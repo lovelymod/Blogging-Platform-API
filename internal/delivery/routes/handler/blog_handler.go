@@ -2,6 +2,7 @@ package handler
 
 import (
 	"blogging-platform-api/internal/entity"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -13,25 +14,57 @@ type BlogHandler struct {
 }
 
 func (h *BlogHandler) GetAll(c *gin.Context) {
+	var pageInt int
+
+	pageStr := c.Query("page")
+	if pageStr != "" {
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, &entity.Resp{
+				Message: err.Error(),
+				Success: false,
+			})
+			return
+		}
+
+		pageInt = page
+	}
+
+	var limitInt int
+
+	limitStr := c.Query("limit")
+	if limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, &entity.Resp{
+				Message: err.Error(),
+				Success: false,
+			})
+			return
+
+		}
+		limitInt = limit
+
+	}
+
 	filter := &entity.BlogFilter{
 		Title:    c.Query("title"),
 		Category: c.Query("category"),
 		Tags:     []uint{},
+		Page:     pageInt,
+		Limit:    limitInt,
 	}
 
-	tagsStr := c.QueryArray("tags")
-
-	for _, v := range tagsStr {
+	for _, v := range c.QueryArray("tags") {
 		tagID, err := strconv.ParseUint(v, 10, 32)
 		if err != nil {
 			return
 		}
 
 		filter.Tags = append(filter.Tags, uint(tagID))
-
 	}
 
-	blogs, err := h.Usecase.GetAll(c.Request.Context(), filter)
+	blogs, totalRows, err := h.Usecase.GetAll(c.Request.Context(), filter)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, &entity.Resp{
@@ -39,12 +72,27 @@ func (h *BlogHandler) GetAll(c *gin.Context) {
 			Success: false,
 		})
 		return
+	}
 
+	var totalPages int
+	limit := filter.Limit
+
+	if filter.Limit > 0 {
+		totalPages = int(math.Ceil(float64(totalRows) / float64(filter.Limit)))
+	} else {
+		totalPages = 1
+		limit = int(totalRows)
 	}
 
 	c.JSON(http.StatusOK, &entity.Resp{
 		Data:    blogs,
 		Success: true,
+		Meta: entity.PaginationMeta{
+			Page:       filter.Page,
+			Limit:      limit,
+			TotalRows:  totalRows,
+			TotalPages: totalPages,
+		},
 	})
 }
 

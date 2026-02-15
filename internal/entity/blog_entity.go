@@ -27,6 +27,8 @@ type BlogFilter struct {
 	Title    string `form:"title"`
 	Category string `form:"category"`
 	Tags     []uint `form:"tags"`
+	Page     int    `form:"page"`
+	Limit    int    `form:"limit"`
 }
 
 type CreateBlogRequest struct {
@@ -44,14 +46,14 @@ type UpdateBlogRequest struct {
 }
 
 type BlogRepository interface {
-	GetAll(ctx context.Context, filter *BlogFilter) ([]Blog, error)
+	GetAll(ctx context.Context, filter *BlogFilter) ([]Blog, int64, error)
 	GetByID(ctx context.Context, id uint) (*Blog, error)
 	Create(ctx context.Context, blog *Blog) (*Blog, error)
 	Update(ctx context.Context, id uint, blog *Blog) (*Blog, error)
 	Delete(ctx context.Context, id uint) error
 }
 type BlogUsecase interface {
-	GetAll(ctx context.Context, filter *BlogFilter) ([]Blog, error)
+	GetAll(ctx context.Context, filter *BlogFilter) ([]Blog, int64, error)
 	GetByID(ctx context.Context, id uint) (*Blog, error)
 	Create(ctx context.Context, blog *Blog) (*Blog, error)
 	Update(ctx context.Context, id uint, blog *Blog) (*Blog, error)

@@ -19,7 +19,7 @@ func NewBlogUsecase(repo entity.BlogRepository, timeout time.Duration) entity.Bl
 	}
 }
 
-func (u *blogUsecase) GetAll(ctx context.Context, filter *entity.BlogFilter) ([]entity.Blog, error) {
+func (u *blogUsecase) GetAll(ctx context.Context, filter *entity.BlogFilter) ([]entity.Blog, int64, error) {
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
 

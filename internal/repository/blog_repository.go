@@ -17,8 +17,9 @@ func NewBlogRepository(db *gorm.DB) entity.BlogRepository {
 	}
 }
 
-func (repo *blogRepository) GetAll(ctx context.Context, filter *entity.BlogFilter) ([]entity.Blog, error) {
+func (repo *blogRepository) GetAll(ctx context.Context, filter *entity.BlogFilter) ([]entity.Blog, int64, error) {
 	blogs := make([]entity.Blog, 0)
+	var totalRows int64
 
 	tx := repo.db.WithContext(ctx).Model(&entity.Blog{})
 
@@ -35,11 +36,25 @@ func (repo *blogRepository) GetAll(ctx context.Context, filter *entity.BlogFilte
 		tx.Joins("JOIN blog_tags ON blogs.id = blog_tags.blog_id").Where("blog_tags.tag_id IN ?", filter.Tags).Group("blogs.id")
 	}
 
-	if err := tx.Order("ID asc").Preload("Tags").Find(&blogs).Error; err != nil {
-		return nil, err
+	if err := tx.Count(&totalRows).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return blogs, nil
+	if filter.Limit > 0 {
+		page := filter.Page
+		if page <= 0 {
+			page = 1
+		}
+
+		offset := (page - 1) * filter.Limit
+		tx.Offset(offset).Limit(filter.Limit)
+	}
+
+	if err := tx.Order("ID asc").Preload("Tags").Find(&blogs).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return blogs, totalRows, nil
 }
 
 func (repo *blogRepository) GetByID(ctx context.Context, id uint) (*entity.Blog, error) {
