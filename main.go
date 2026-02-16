@@ -2,8 +2,8 @@ package main
 
 import (
 	"blogging-platform-api/internal/bootstrap"
+	"blogging-platform-api/internal/delivery/handler"
 	"blogging-platform-api/internal/delivery/routes"
-	"blogging-platform-api/internal/delivery/routes/handler"
 	"blogging-platform-api/internal/repository"
 	"blogging-platform-api/internal/usecase"
 	"time"
