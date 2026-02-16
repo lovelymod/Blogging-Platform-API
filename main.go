@@ -3,7 +3,7 @@ package main
 import (
 	"blogging-platform-api/internal/bootstrap"
 	"blogging-platform-api/internal/delivery/handler"
-	"blogging-platform-api/internal/delivery/routes"
+	"blogging-platform-api/internal/delivery/router"
 	"blogging-platform-api/internal/repository"
 	"blogging-platform-api/internal/usecase"
 	"time"
@@ -21,7 +21,7 @@ func main() {
 	blogUsecase := usecase.NewBlogUsecase(blogRepo, time.Second*2)
 	blogHandler := handler.NewBlogHandler(blogUsecase)
 
-	h := &routes.Handlers{
+	h := &router.Handlers{
 		BlogHandler: blogHandler,
 	}
 
@@ -29,7 +29,7 @@ func main() {
 
 	r.Use(app.Cors)
 
-	routes.SetupRoutes(r, h)
+	router.SetupRoutes(r, h)
 
 	r.Run(":8080")
 }

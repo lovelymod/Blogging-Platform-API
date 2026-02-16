@@ -1,4 +1,4 @@
-package routes
+package router
 
 import (
 	"blogging-platform-api/internal/entity"
