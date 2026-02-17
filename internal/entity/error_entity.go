@@ -10,5 +10,5 @@ var (
 
 // Blog Error
 var (
-	ErrTagMustBeUnique = errors.New("tag_must_be_unique")
+	ErrBlogTagMustBeUnique = errors.New("tag_must_be_unique")
 )

@@ -3,6 +3,7 @@ package repository
 import (
 	"blogging-platform-api/internal/entity"
 	"context"
+	"errors"
 	"log"
 
 	"gorm.io/gorm"
@@ -65,6 +66,11 @@ func (repo *blogRepository) GetByID(ctx context.Context, id uint) (*entity.Blog,
 
 	if err := repo.db.WithContext(ctx).Preload("Tags").First(&blog, id).Error; err != nil {
 		log.Println(err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, entity.ErrGlobalNotFound
+		}
+
 		return nil, entity.ErrGlobalServerErr
 	}
 
@@ -124,7 +130,7 @@ func (repo *blogRepository) Delete(ctx context.Context, id uint) error {
 	}
 
 	if result.RowsAffected == 0 {
-		return entity.ErrGlobalServerErr
+		return entity.ErrGlobalNotFound
 	}
 
 	return nil

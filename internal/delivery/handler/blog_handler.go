@@ -74,8 +74,8 @@ func (h *blogHandler) GetAll(c *gin.Context) {
 	blogs, totalRows, err := h.Usecase.GetAll(c.Request.Context(), filter)
 
 	if err != nil {
-		httpStatus := utils.GetHttpStatus(err)
-		c.JSON(httpStatus, &entity.Resp{
+		httpErrStatus := utils.GetHttpErrStatus(err)
+		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -117,8 +117,8 @@ func (h *blogHandler) GetByID(c *gin.Context) {
 	blog, err := h.Usecase.GetByID(c.Request.Context(), uint(blogID))
 
 	if err != nil {
-		httpStatus := utils.GetHttpStatus(err)
-		c.JSON(httpStatus, &entity.Resp{
+		httpErrStatus := utils.GetHttpErrStatus(err)
+		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -157,7 +157,8 @@ func (h *blogHandler) Create(c *gin.Context) {
 	createdBlog, err := h.Usecase.Create(c.Request.Context(), &blog)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, &entity.Resp{
+		httpErrStatus := utils.GetHttpErrStatus(err)
+		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -204,8 +205,8 @@ func (h *blogHandler) Update(c *gin.Context) {
 	updatedBlog, err := h.Usecase.Update(c.Request.Context(), uint(blogID), &updatedData)
 
 	if err != nil {
-		httpStatus := utils.GetHttpStatus(err)
-		c.JSON(httpStatus, &entity.Resp{
+		httpErrStatus := utils.GetHttpErrStatus(err)
+		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -229,8 +230,8 @@ func (h *blogHandler) Delete(c *gin.Context) {
 	}
 
 	if err := h.Usecase.Delete(c.Request.Context(), uint(deleteID)); err != nil {
-		httpStatus := utils.GetHttpStatus(err)
-		c.JSON(httpStatus, &entity.Resp{
+		httpErrStatus := utils.GetHttpErrStatus(err)
+		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})

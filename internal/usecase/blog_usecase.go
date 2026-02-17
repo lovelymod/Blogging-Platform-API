@@ -39,7 +39,7 @@ func (u *blogUsecase) Create(ctx context.Context, blog *entity.Blog) (*entity.Bl
 	tagsMap := make(map[uint]struct{})
 	for _, v := range blog.Tags {
 		if _, found := tagsMap[v.ID]; found {
-			return nil, entity.ErrGlobalNotFound
+			return nil, entity.ErrBlogTagMustBeUnique
 		}
 
 		tagsMap[v.ID] = struct{}{}
@@ -55,7 +55,7 @@ func (u *blogUsecase) Update(ctx context.Context, id uint, updateBlog *entity.Bl
 	tagsMap := make(map[uint]struct{})
 	for _, v := range updateBlog.Tags {
 		if _, found := tagsMap[v.ID]; found {
-			return nil, entity.ErrGlobalNotFound
+			return nil, entity.ErrBlogTagMustBeUnique
 		}
 
 		tagsMap[v.ID] = struct{}{}

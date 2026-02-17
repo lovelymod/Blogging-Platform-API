@@ -2,15 +2,15 @@ package utils
 
 import (
 	"blogging-platform-api/internal/entity"
+	"errors"
 	"net/http"
 )
 
-func GetHttpStatus(err error) int {
-	switch err {
-	case entity.ErrGlobalServerErr:
+func GetHttpErrStatus(err error) int {
+	if errors.Is(err, entity.ErrGlobalServerErr) {
 		return http.StatusInternalServerError
-
-	case entity.ErrGlobalNotFound:
+	}
+	if errors.Is(err, entity.ErrGlobalNotFound) {
 		return http.StatusNotFound
 	}
 
