@@ -2,6 +2,7 @@ package handler
 
 import (
 	"blogging-platform-api/internal/entity"
+	"blogging-platform-api/pkg/utils"
 	"math"
 	"net/http"
 	"strconv"
@@ -73,7 +74,8 @@ func (h *blogHandler) GetAll(c *gin.Context) {
 	blogs, totalRows, err := h.Usecase.GetAll(c.Request.Context(), filter)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, &entity.Resp{
+		httpStatus := utils.GetHttpStatus(err)
+		c.JSON(httpStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -115,7 +117,8 @@ func (h *blogHandler) GetByID(c *gin.Context) {
 	blog, err := h.Usecase.GetByID(c.Request.Context(), uint(blogID))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, &entity.Resp{
+		httpStatus := utils.GetHttpStatus(err)
+		c.JSON(httpStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -201,7 +204,8 @@ func (h *blogHandler) Update(c *gin.Context) {
 	updatedBlog, err := h.Usecase.Update(c.Request.Context(), uint(blogID), &updatedData)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, &entity.Resp{
+		httpStatus := utils.GetHttpStatus(err)
+		c.JSON(httpStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})
@@ -225,7 +229,8 @@ func (h *blogHandler) Delete(c *gin.Context) {
 	}
 
 	if err := h.Usecase.Delete(c.Request.Context(), uint(deleteID)); err != nil {
-		c.JSON(http.StatusInternalServerError, &entity.Resp{
+		httpStatus := utils.GetHttpStatus(err)
+		c.JSON(httpStatus, &entity.Resp{
 			Message: err.Error(),
 			Success: false,
 		})

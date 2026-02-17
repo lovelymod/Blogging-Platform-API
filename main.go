@@ -12,11 +12,9 @@ import (
 )
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	app := bootstrap.App()
 
-	app := bootstrap.App() // โหลด DB/Config มาไว้ในตัวแปรเดียว
-
-	// สร้าง Layer ต่างๆ
+	// Blog layer
 	blogRepo := repository.NewBlogRepository(app.DB)
 	blogUsecase := usecase.NewBlogUsecase(blogRepo, time.Second*2)
 	blogHandler := handler.NewBlogHandler(blogUsecase)

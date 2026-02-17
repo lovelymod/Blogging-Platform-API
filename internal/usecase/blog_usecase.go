@@ -3,7 +3,6 @@ package usecase
 import (
 	"blogging-platform-api/internal/entity"
 	"context"
-	"errors"
 	"time"
 )
 
@@ -40,7 +39,7 @@ func (u *blogUsecase) Create(ctx context.Context, blog *entity.Blog) (*entity.Bl
 	tagsMap := make(map[uint]struct{})
 	for _, v := range blog.Tags {
 		if _, found := tagsMap[v.ID]; found {
-			return nil, errors.New("tags id must be unique")
+			return nil, entity.ErrGlobalNotFound
 		}
 
 		tagsMap[v.ID] = struct{}{}
@@ -56,7 +55,7 @@ func (u *blogUsecase) Update(ctx context.Context, id uint, updateBlog *entity.Bl
 	tagsMap := make(map[uint]struct{})
 	for _, v := range updateBlog.Tags {
 		if _, found := tagsMap[v.ID]; found {
-			return nil, errors.New("tags id must be unique")
+			return nil, entity.ErrGlobalNotFound
 		}
 
 		tagsMap[v.ID] = struct{}{}

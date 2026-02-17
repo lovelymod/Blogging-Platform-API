@@ -25,7 +25,11 @@ type Application struct {
 }
 
 func App() Application {
-	if err := godotenv.Load("config/.env"); err != nil {
+	gin.SetMode(gin.ReleaseMode)
+
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	if err := godotenv.Load(); err != nil {
 		log.Println("Error loading .env file")
 	}
 
