@@ -11,12 +11,12 @@ import (
 )
 
 type blogHandler struct {
-	Usecase entity.BlogUsecase
+	usecase entity.BlogUsecase
 }
 
 func NewBlogHandler(u entity.BlogUsecase) entity.BlogHandler {
 	return &blogHandler{
-		Usecase: u,
+		usecase: u,
 	}
 }
 
@@ -71,7 +71,7 @@ func (h *blogHandler) GetAll(c *gin.Context) {
 		filter.Tags = append(filter.Tags, uint(tagID))
 	}
 
-	blogs, totalRows, err := h.Usecase.GetAll(c.Request.Context(), filter)
+	blogs, totalRows, err := h.usecase.GetAll(c.Request.Context(), filter)
 
 	if err != nil {
 		httpErrStatus := utils.GetHttpErrStatus(err)
@@ -95,7 +95,7 @@ func (h *blogHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, &entity.Resp{
 		Data:    blogs,
 		Success: true,
-		Meta: entity.PaginationMeta{
+		Meta: &entity.PaginationMeta{
 			Page:       filter.Page,
 			Limit:      limit,
 			TotalRows:  totalRows,
@@ -114,7 +114,7 @@ func (h *blogHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	blog, err := h.Usecase.GetByID(c.Request.Context(), uint(blogID))
+	blog, err := h.usecase.GetByID(c.Request.Context(), uint(blogID))
 
 	if err != nil {
 		httpErrStatus := utils.GetHttpErrStatus(err)
@@ -154,7 +154,7 @@ func (h *blogHandler) Create(c *gin.Context) {
 		Tags:     tags,
 	}
 
-	createdBlog, err := h.Usecase.Create(c.Request.Context(), &blog)
+	createdBlog, err := h.usecase.Create(c.Request.Context(), &blog)
 
 	if err != nil {
 		httpErrStatus := utils.GetHttpErrStatus(err)
@@ -202,7 +202,7 @@ func (h *blogHandler) Update(c *gin.Context) {
 		Tags:     tags,
 	}
 
-	updatedBlog, err := h.Usecase.Update(c.Request.Context(), uint(blogID), &updatedData)
+	updatedBlog, err := h.usecase.Update(c.Request.Context(), uint(blogID), &updatedData)
 
 	if err != nil {
 		httpErrStatus := utils.GetHttpErrStatus(err)
@@ -229,7 +229,7 @@ func (h *blogHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.Usecase.Delete(c.Request.Context(), uint(deleteID)); err != nil {
+	if err := h.usecase.Delete(c.Request.Context(), uint(deleteID)); err != nil {
 		httpErrStatus := utils.GetHttpErrStatus(err)
 		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),

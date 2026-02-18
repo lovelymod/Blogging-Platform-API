@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"blogging-platform-api/internal/entity"
 	"log"
 	"os"
 
@@ -10,17 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
-type Config struct {
-	SUPABASE_HOST     string
-	SUPABASE_USER     string
-	SUPABASE_PASSWORD string
-	SUPABASE_DB       string
-	SUPABASE_PORT     string
-}
-
 type Application struct {
 	DB     *gorm.DB
-	Config *Config
+	Config *entity.Config
 	Cors   gin.HandlerFunc
 }
 
@@ -33,18 +26,19 @@ func App() Application {
 		log.Println("Error loading .env file")
 	}
 
-	env := &Config{
+	config := &entity.Config{
 		SUPABASE_HOST:     os.Getenv("SUPABASE_HOST"),
 		SUPABASE_USER:     os.Getenv("SUPABASE_USER"),
 		SUPABASE_PASSWORD: os.Getenv("SUPABASE_PASSWORD"),
 		SUPABASE_DB:       os.Getenv("SUPABASE_DB"),
 		SUPABASE_PORT:     os.Getenv("SUPABASE_PORT"),
+		HASH_COST:         os.Getenv("HASH_COST"),
 	}
 
 	app := &Application{
-		Config: env,
+		Config: config,
 	}
-	app.DB = SetupDatabase(env) // เรียกฟังก์ชันจาก database.go
+	app.DB = SetupDatabase(config) // เรียกฟังก์ชันจาก database.go
 
 	app.Cors = cors.Default()
 	return *app

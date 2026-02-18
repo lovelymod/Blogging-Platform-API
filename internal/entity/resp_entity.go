@@ -8,8 +8,8 @@ type PaginationMeta struct {
 }
 
 type Resp struct {
-	Message string         `json:"message,omitempty"`
-	Data    any            `json:"data,omitempty"`
-	Success bool           `json:"success"`
-	Meta    PaginationMeta `json:"meta"`
+	Message string          `json:"message,omitempty"`
+	Data    any             `json:"data,omitempty"`
+	Success bool            `json:"success"`
+	Meta    *PaginationMeta `json:"meta,omitempty"`
 }

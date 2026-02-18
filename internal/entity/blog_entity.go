@@ -21,7 +21,7 @@ type Blog struct {
 	Tags      []Tag          `json:"tags" gorm:"many2many:blog_tags;"`
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
 type BlogFilter struct {

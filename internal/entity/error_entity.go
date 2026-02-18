@@ -12,3 +12,8 @@ var (
 var (
 	ErrBlogTagMustBeUnique = errors.New("tag_must_be_unique")
 )
+
+// Blog User
+var (
+	ErrUserThisEmailIsAlreadyUsed = errors.New("this_email_is_already_used")
+)

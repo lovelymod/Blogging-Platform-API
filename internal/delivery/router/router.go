@@ -8,11 +8,14 @@ import (
 
 type Handlers struct {
 	BlogHandler entity.BlogHandler
+	UserHandler entity.UserHandler
 }
 
 func SetupRoutes(r *gin.Engine, h *Handlers) {
 	// Public Routes
 	api := r.Group("/api")
+
+	// Blog
 	{
 
 		api.GET("/blogs", h.BlogHandler.GetAll)
@@ -20,6 +23,11 @@ func SetupRoutes(r *gin.Engine, h *Handlers) {
 		api.POST("/blog", h.BlogHandler.Create)
 		api.PUT("/blog/:id", h.BlogHandler.Update)
 		api.DELETE("/blog/:id", h.BlogHandler.Delete)
+	}
+
+	// User
+	{
+		api.POST("/register", h.UserHandler.Register)
 	}
 
 	// api := r.GroupogHandler.GetAll)
