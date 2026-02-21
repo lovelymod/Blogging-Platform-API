@@ -13,7 +13,10 @@ var (
 	ErrBlogTagMustBeUnique = errors.New("tag_must_be_unique")
 )
 
-// Blog User
+// Auth Error
 var (
-	ErrUserThisEmailIsAlreadyUsed = errors.New("this_email_is_already_used")
+	ErrAuthThisEmailOrUsernameIsAlreadyUsed = errors.New("this_email_or_username_is_already_used")
+	ErrAuthWrongEmailOrPassword             = errors.New("wrong_email_or_password")
+	ErrAuthTokenExpired                     = errors.New("token_expired")
+	ErrAuthTokenInvalid                     = errors.New("token_invalid")
 )

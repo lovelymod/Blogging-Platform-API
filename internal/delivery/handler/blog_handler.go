@@ -63,7 +63,7 @@ func (h *blogHandler) GetAll(c *gin.Context) {
 	}
 
 	for _, v := range c.QueryArray("tags") {
-		tagID, err := strconv.ParseUint(v, 10, 32)
+		tagID, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
 			return
 		}
@@ -105,7 +105,7 @@ func (h *blogHandler) GetAll(c *gin.Context) {
 }
 
 func (h *blogHandler) GetByID(c *gin.Context) {
-	blogID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	blogID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, &entity.Resp{
 			Message: err.Error(),
@@ -172,7 +172,7 @@ func (h *blogHandler) Create(c *gin.Context) {
 }
 
 func (h *blogHandler) Update(c *gin.Context) {
-	blogID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	blogID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, &entity.Resp{
 			Message: err.Error(),
@@ -220,7 +220,7 @@ func (h *blogHandler) Update(c *gin.Context) {
 }
 
 func (h *blogHandler) Delete(c *gin.Context) {
-	deleteID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	deleteID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, &entity.Resp{
 			Message: err.Error(),

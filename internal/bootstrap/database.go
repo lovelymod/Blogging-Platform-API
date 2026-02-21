@@ -24,7 +24,7 @@ func SetupDatabase(config *entity.Config) *gorm.DB {
 	}
 
 	// สั่งสร้าง Table อัตโนมัติจาก Entity ที่เรานิยามไว้
-	err = db.AutoMigrate(&entity.Blog{}, &entity.Tag{}, &entity.User{})
+	err = db.AutoMigrate(&entity.Blog{}, &entity.Tag{}, &entity.User{}, &entity.RefreshToken{})
 	if err != nil {
 		log.Fatal("Migration Failed:", err)
 	}

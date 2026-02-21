@@ -2,36 +2,35 @@ package router
 
 import (
 	"blogging-platform-api/internal/entity"
+	"blogging-platform-api/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Handlers struct {
 	BlogHandler entity.BlogHandler
-	UserHandler entity.UserHandler
+	AuthHandler entity.AuthHandler
 }
 
-func SetupRoutes(r *gin.Engine, h *Handlers) {
-	// Public Routes
+func SetupRoutes(r *gin.Engine, h *Handlers, config *entity.Config) {
 	api := r.Group("/api")
-
-	// Blog
-	{
-
-		api.GET("/blogs", h.BlogHandler.GetAll)
-		api.GET("/blog/:id", h.BlogHandler.GetByID)
-		api.POST("/blog", h.BlogHandler.Create)
-		api.PUT("/blog/:id", h.BlogHandler.Update)
-		api.DELETE("/blog/:id", h.BlogHandler.Delete)
-	}
 
 	// User
 	{
-		api.POST("/register", h.UserHandler.Register)
+		api.POST("/register", h.AuthHandler.Register)
+		api.POST("/login", h.AuthHandler.Login)
+		api.POST("/refresh-token", h.AuthHandler.RefreshToken)
 	}
 
-	// api := r.GroupogHandler.GetAll)
+	protected := api.Use(middleware.AuthMiddleware(config))
 
-	// Protected Routes (ตัวอย่างถ้ามี Middleware)
-	// api.Use(middleware.AuthMiddleware()).POST("/blogs", blogHandler.Create)
+	// Blog
+	{
+		protected.GET("/blogs", h.BlogHandler.GetAll)
+		protected.GET("/blog/:id", h.BlogHandler.GetByID)
+		protected.POST("/blog", h.BlogHandler.Create)
+		protected.PUT("/blog/:id", h.BlogHandler.Update)
+		protected.DELETE("/blog/:id", h.BlogHandler.Delete)
+	}
+
 }

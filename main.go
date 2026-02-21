@@ -20,20 +20,20 @@ func main() {
 	blogHandler := handler.NewBlogHandler(blogUsecase)
 
 	// User layer
-	userRepo := repository.NewUserRepository(app.DB)
-	userUsecase := usecase.NewUserUsecase(userRepo, time.Second*2, app.Config)
-	userHandler := handler.NewUserHandler(userUsecase)
+	authRepo := repository.NewAuthRepository(app.DB)
+	authUsecase := usecase.NewAuthUsecase(authRepo, time.Second*2, app.Config)
+	authHandler := handler.NewAuthHandler(authUsecase)
 
 	h := &router.Handlers{
 		BlogHandler: blogHandler,
-		UserHandler: userHandler,
+		AuthHandler: authHandler,
 	}
 
 	r := gin.Default()
 
 	r.Use(app.Cors)
 
-	router.SetupRoutes(r, h)
+	router.SetupRoutes(r, h, app.Config)
 
 	r.Run(":8080")
 }

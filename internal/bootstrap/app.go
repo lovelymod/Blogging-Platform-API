@@ -27,12 +27,14 @@ func App() Application {
 	}
 
 	config := &entity.Config{
-		SUPABASE_HOST:     os.Getenv("SUPABASE_HOST"),
-		SUPABASE_USER:     os.Getenv("SUPABASE_USER"),
-		SUPABASE_PASSWORD: os.Getenv("SUPABASE_PASSWORD"),
-		SUPABASE_DB:       os.Getenv("SUPABASE_DB"),
-		SUPABASE_PORT:     os.Getenv("SUPABASE_PORT"),
-		HASH_COST:         os.Getenv("HASH_COST"),
+		SUPABASE_HOST:        os.Getenv("SUPABASE_HOST"),
+		SUPABASE_USER:        os.Getenv("SUPABASE_USER"),
+		SUPABASE_PASSWORD:    os.Getenv("SUPABASE_PASSWORD"),
+		SUPABASE_DB:          os.Getenv("SUPABASE_DB"),
+		SUPABASE_PORT:        os.Getenv("SUPABASE_PORT"),
+		HASH_COST:            os.Getenv("HASH_COST"),
+		ACCESS_TOKEN_SECRET:  os.Getenv("ACCESS_TOKEN_SECRET"),
+		REFRESH_TOKEN_SECRET: os.Getenv("REFRESH_TOKEN_SECRET"),
 	}
 
 	app := &Application{
