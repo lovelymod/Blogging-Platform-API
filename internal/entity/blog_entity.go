@@ -15,6 +15,8 @@ type Tag struct {
 
 type Blog struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
+	UserID    uint           `json:"-" gorm:"not null;index"`
+	User      *User          `json:"author,omitempty"`
 	Title     string         `json:"title"`
 	Content   *string        `json:"content"`
 	Category  *string        `json:"category"`

@@ -64,7 +64,12 @@ func (repo *blogRepository) GetAll(ctx context.Context, filter *entity.BlogFilte
 func (repo *blogRepository) GetByID(ctx context.Context, id uint) (*entity.Blog, error) {
 	var blog entity.Blog
 
-	if err := repo.db.WithContext(ctx).Preload("Tags").First(&blog, id).Error; err != nil {
+	err := repo.db.WithContext(ctx).
+		Preload("Tags").
+		Preload("User").
+		First(&blog, id).Error
+
+	if err != nil {
 		log.Println(err)
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {

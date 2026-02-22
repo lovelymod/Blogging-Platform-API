@@ -147,7 +147,12 @@ func (h *blogHandler) Create(c *gin.Context) {
 		tags = append(tags, entity.Tag{ID: v})
 	}
 
+	userIDStr, _ := c.MustGet("userID").(string)
+
+	userID, _ := strconv.ParseUint(userIDStr, 10, 64)
+
 	blog := entity.Blog{
+		UserID:   uint(userID),
 		Title:    req.Title,
 		Content:  req.Content,
 		Category: req.Category,

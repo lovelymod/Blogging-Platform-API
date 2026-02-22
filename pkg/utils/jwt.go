@@ -17,7 +17,7 @@ func SignAccessToken(user *entity.User, secret string) (*jwt.RegisteredClaims, s
 		Issuer:    "blogging-platform-api",
 		Subject:   strconv.FormatUint(uint64(user.ID), 10),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 1)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -57,7 +57,7 @@ func SignRefreshToken(user *entity.User, secret string) (*jwt.RegisteredClaims, 
 		Issuer:    "blogging-platform-api",
 		Subject:   strconv.FormatUint(uint64(user.ID), 10),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 5)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
 		ID:        uuid.NewString(),
 	}
 
