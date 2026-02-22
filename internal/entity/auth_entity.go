@@ -42,18 +42,18 @@ type AuthLoginResp struct {
 }
 
 type AuthRepository interface {
-	CreateUser(ctx context.Context, user *User) error
+	CreateUser(ctx context.Context, registerUser *User) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
 	GetRefreshToken(ctx context.Context, claim *jwt.RegisteredClaims) (*RefreshToken, error)
-	CreateRefreshToken(ctx context.Context, rtk *RefreshToken) error
-	UpdateRefreshToken(ctx context.Context, rtk *RefreshToken) error
+	CreateRefreshToken(ctx context.Context, rt *RefreshToken) error
+	UpdateRefreshToken(ctx context.Context, rt *RefreshToken) error
 }
 
 type AuthUsecase interface {
 	Register(req *AuthRegisterReq) error
 	Login(req *AuthLoginReq) (*AuthLoginResp, error)
-	Logout(rtk string) error
-	RefreshToken(rtk string) (string, string, error)
+	Logout(rt string) error
+	RefreshToken(rt string) (string, string, error)
 }
 
 type AuthHandler interface {

@@ -11,10 +11,10 @@ import (
 
 func AuthMiddleware(config *entity.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		atk := c.GetHeader("Authorization")
-		splitAtk := strings.Split(atk, " ")
+		at := c.GetHeader("Authorization")
+		splitAT := strings.Split(at, " ")
 
-		if len(splitAtk) != 2 || splitAtk[0] != "Bearer" || splitAtk[1] == "" {
+		if len(splitAT) != 2 || splitAT[0] != "Bearer" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Resp{
 				Message: entity.ErrAuthTokenInvalid.Error(),
 				Success: false,
@@ -22,7 +22,15 @@ func AuthMiddleware(config *entity.Config) gin.HandlerFunc {
 			return
 		}
 
-		claims, err := utils.ParseAccessToken(splitAtk[1], config.ACCESS_TOKEN_SECRET)
+		if splitAT[1] == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Resp{
+				Message: entity.ErrAuthTokenNotProvided.Error(),
+				Success: false,
+			})
+			return
+		}
+
+		claims, err := utils.ParseAccessToken(splitAT[1], config.ACCESS_TOKEN_SECRET)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Resp{
 				Message: err.Error(),

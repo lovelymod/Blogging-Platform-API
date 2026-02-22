@@ -74,106 +74,110 @@ func (u *authUsercase) Login(req *entity.AuthLoginReq) (*entity.AuthLoginResp, e
 		return nil, entity.ErrAuthWrongEmailOrPassword
 	}
 
-	atk, err := utils.SignAccessToken(existUser, u.accessTokenSecret)
-	if err != nil {
-		return nil, entity.ErrGlobalServerErr
-	}
-
-	claims, rtk, err := utils.SignRefreshToken(existUser, u.refreshTokenSecret)
+	_, at, err := utils.SignAccessToken(existUser, u.accessTokenSecret)
 	if err != nil {
 		log.Println(err)
 		return nil, entity.ErrGlobalServerErr
 	}
 
-	savedRtk := &entity.RefreshToken{
-		UserID:    existUser.ID,
-		Token:     rtk,
-		ExpiresAt: claims.ExpiresAt.Time,
-		Jti:       claims.ID,
+	rtClaims, rt, err := utils.SignRefreshToken(existUser, u.refreshTokenSecret)
+	if err != nil {
+		log.Println(err)
+		return nil, entity.ErrGlobalServerErr
 	}
 
-	if err := u.repo.CreateRefreshToken(ctx, savedRtk); err != nil {
+	savedRT := &entity.RefreshToken{
+		UserID:    existUser.ID,
+		Token:     rt,
+		ExpiresAt: rtClaims.ExpiresAt.Time,
+		Jti:       rtClaims.ID,
+	}
+
+	if err := u.repo.CreateRefreshToken(ctx, savedRT); err != nil {
 		return nil, err
 	}
 
 	return &entity.AuthLoginResp{
 		User:         existUser,
-		AccessToken:  atk,
-		RefreshToken: rtk,
+		AccessToken:  at,
+		RefreshToken: rt,
 	}, nil
 }
 
-func (u *authUsercase) Logout(refreshToken string) error {
+func (u *authUsercase) Logout(rt string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
-	cliams, err := utils.ParseRefreshToken(refreshToken, u.refreshTokenSecret)
+	cliams, err := utils.ParseRefreshToken(rt, u.refreshTokenSecret)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	updatedRefreshTokon := &entity.RefreshToken{
+	updatedRT := &entity.RefreshToken{
 		Jti:       cliams.ID,
 		IsRevoked: true,
 	}
 
-	return u.repo.UpdateRefreshToken(ctx, updatedRefreshTokon)
+	return u.repo.UpdateRefreshToken(ctx, updatedRT)
 }
 
-func (u *authUsercase) RefreshToken(rtk string) (string, string, error) {
+func (u *authUsercase) RefreshToken(rt string) (string, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
-	// Get refreshToken in db
-	oldClaims, err := utils.ParseRefreshToken(rtk, u.refreshTokenSecret)
+	// Check refresh token is valid or not
+	oldRTClaims, err := utils.ParseRefreshToken(rt, u.refreshTokenSecret)
 	if err != nil {
 		return "", "", err
 	}
 
 	// Get refreshToken in db
-	existRtk, err := u.repo.GetRefreshToken(ctx, oldClaims)
+	existRT, err := u.repo.GetRefreshToken(ctx, oldRTClaims)
 	if err != nil {
 		return "", "", err
 	}
 
-	if existRtk.IsRevoked {
-		return "", "", entity.ErrAuthTokenExpired
-	}
-
-	if time.Now().After(existRtk.ExpiresAt) {
+	if existRT.IsRevoked || time.Now().After(existRT.ExpiresAt) {
 		return "", "", entity.ErrAuthTokenExpired
 	}
 
 	// Sign new accessToken
-	newAtk, err := utils.SignAccessToken(&existRtk.User, u.accessTokenSecret)
+	_, newAT, err := utils.SignAccessToken(&existRT.User, u.accessTokenSecret)
 	if err != nil {
 		return "", "", entity.ErrGlobalServerErr
 	}
 
 	// Sign new refreshToken
-	newClaims, newRtk, err := utils.SignRefreshToken(&existRtk.User, u.refreshTokenSecret)
+	newRTClaims, newRT, err := utils.SignRefreshToken(&existRT.User, u.refreshTokenSecret)
 	if err != nil {
 		log.Println(err)
 		return "", "", entity.ErrGlobalServerErr
 	}
 
-	savedRtk := &entity.RefreshToken{
-		UserID:    existRtk.UserID,
-		Token:     newRtk,
-		ExpiresAt: newClaims.ExpiresAt.Time,
-		Jti:       newClaims.ID,
+	// Save new refreshToken to db
+	userID, err := strconv.ParseUint(newRTClaims.Subject, 10, 64)
+	if err != nil {
+		log.Println(err)
+		return "", "", entity.ErrGlobalServerErr
 	}
 
-	if err := u.repo.CreateRefreshToken(ctx, savedRtk); err != nil {
+	savedRT := &entity.RefreshToken{
+		UserID:    uint(userID),
+		Token:     newRT,
+		ExpiresAt: newRTClaims.ExpiresAt.Time,
+		Jti:       newRTClaims.ID,
+	}
+
+	if err := u.repo.CreateRefreshToken(ctx, savedRT); err != nil {
 		return "", "", err
 	}
 
-	// Revok old refreshToken
-	existRtk.IsRevoked = true
-	if err := u.repo.UpdateRefreshToken(ctx, existRtk); err != nil {
+	// Revoke old refreshToken
+	existRT.IsRevoked = true
+	if err := u.repo.UpdateRefreshToken(ctx, existRT); err != nil {
 		return "", "", err
 	}
 
-	return newAtk, newRtk, nil
+	return newAT, newRT, nil
 }

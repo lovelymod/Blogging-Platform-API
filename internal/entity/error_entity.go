@@ -19,4 +19,5 @@ var (
 	ErrAuthWrongEmailOrPassword             = errors.New("wrong_email_or_password")
 	ErrAuthTokenExpired                     = errors.New("token_expired")
 	ErrAuthTokenInvalid                     = errors.New("token_invalid")
+	ErrAuthTokenNotProvided                 = errors.New("token_not_provided")
 )

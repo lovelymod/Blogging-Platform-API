@@ -86,16 +86,16 @@ func (h *authHandler) Login(c *gin.Context) {
 }
 
 func (h *authHandler) Logout(c *gin.Context) {
-	refreshToken, err := c.Cookie("refreshToken")
+	rt, err := c.Cookie("refreshToken")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, &entity.Resp{
-			Message: err.Error(),
+			Message: entity.ErrAuthTokenNotProvided.Error(),
 			Success: false,
 		})
 		return
 	}
 
-	if err := h.usecase.Logout(refreshToken); err != nil {
+	if err := h.usecase.Logout(rt); err != nil {
 		httpErrStatus := utils.GetHttpErrStatus(err)
 		c.JSON(httpErrStatus, &entity.Resp{
 			Message: err.Error(),
@@ -112,17 +112,17 @@ func (h *authHandler) Logout(c *gin.Context) {
 }
 
 func (h *authHandler) RefreshToken(c *gin.Context) {
-	rtk, err := c.Cookie("refreshToken")
+	rt, err := c.Cookie("refreshToken")
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, &entity.Resp{
-			Message: err.Error(),
+		c.JSON(http.StatusUnauthorized, &entity.Resp{
+			Message: entity.ErrAuthTokenNotProvided.Error(),
 			Success: false,
 		})
 		return
 	}
 
-	newAtk, newRtk, err := h.usecase.RefreshToken(rtk)
+	newAT, newRT, err := h.usecase.RefreshToken(rt)
 	if err != nil {
 		log.Println(err)
 		httpErrStatus := utils.GetHttpErrStatus(err)
@@ -133,10 +133,10 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("refreshToken", newRtk, 60*5, "/", "localhost", false, true)
+	c.SetCookie("refreshToken", newRT, 60*5, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, &entity.Resp{
 		Data: &entity.AuthLoginResp{
-			AccessToken: newAtk,
+			AccessToken: newAT,
 		},
 		Success: true,
 		Message: "refreshed",

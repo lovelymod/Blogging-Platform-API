@@ -57,11 +57,11 @@ func (repo *authRepository) GetUserByEmail(ctx context.Context, email string) (*
 }
 
 func (repo *authRepository) GetRefreshToken(ctx context.Context, claims *jwt.RegisteredClaims) (*entity.RefreshToken, error) {
-	var existRtk entity.RefreshToken
+	var existRT entity.RefreshToken
 
 	userID, _ := strconv.ParseUint(claims.Subject, 10, 64)
 
-	if err := repo.db.WithContext(ctx).Preload("User").Where(&entity.RefreshToken{Jti: claims.ID, UserID: uint(userID)}).First(&existRtk).Error; err != nil {
+	if err := repo.db.WithContext(ctx).Preload("User").Where(&entity.RefreshToken{Jti: claims.ID, UserID: uint(userID)}).First(&existRT).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, entity.ErrGlobalNotFound
 		}
@@ -69,11 +69,11 @@ func (repo *authRepository) GetRefreshToken(ctx context.Context, claims *jwt.Reg
 		return nil, entity.ErrGlobalServerErr
 	}
 
-	return &existRtk, nil
+	return &existRT, nil
 }
 
-func (repo *authRepository) CreateRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {
-	if err := repo.db.WithContext(ctx).Create(rtk).Error; err != nil {
+func (repo *authRepository) CreateRefreshToken(ctx context.Context, rt *entity.RefreshToken) error {
+	if err := repo.db.WithContext(ctx).Create(rt).Error; err != nil {
 		log.Println(err)
 		return entity.ErrGlobalServerErr
 	}
@@ -81,8 +81,8 @@ func (repo *authRepository) CreateRefreshToken(ctx context.Context, rtk *entity.
 	return nil
 }
 
-func (repo *authRepository) UpdateRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {
-	if err := repo.db.Where(&entity.RefreshToken{Jti: rtk.Jti}).Updates(rtk).Error; err != nil {
+func (repo *authRepository) UpdateRefreshToken(ctx context.Context, rt *entity.RefreshToken) error {
+	if err := repo.db.Where(&entity.RefreshToken{Jti: rt.Jti}).Updates(rt).Error; err != nil {
 		log.Println(err)
 		return entity.ErrGlobalServerErr
 	}

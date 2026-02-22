@@ -10,10 +10,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func SignAccessToken(user *entity.User, secret string) (string, error) {
+func SignAccessToken(user *entity.User, secret string) (*jwt.RegisteredClaims, string, error) {
 	secretKey := []byte(secret)
 
-	claims := jwt.RegisteredClaims{
+	claims := &jwt.RegisteredClaims{
 		Issuer:    "blogging-platform-api",
 		Subject:   strconv.FormatUint(uint64(user.ID), 10),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -22,7 +22,9 @@ func SignAccessToken(user *entity.User, secret string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString(secretKey)
+	sign, err := token.SignedString(secretKey)
+
+	return claims, sign, err
 }
 
 func ParseAccessToken(tokenString string, secret string) (*jwt.RegisteredClaims, error) {

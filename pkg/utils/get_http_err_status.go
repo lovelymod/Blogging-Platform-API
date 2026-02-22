@@ -13,7 +13,9 @@ func GetHttpErrStatus(err error) int {
 	if errors.Is(err, entity.ErrGlobalNotFound) {
 		return http.StatusNotFound
 	}
-	if errors.Is(err, entity.ErrAuthTokenExpired) {
+	if errors.Is(err, entity.ErrAuthTokenExpired) ||
+		errors.Is(err, entity.ErrAuthTokenInvalid) ||
+		errors.Is(err, entity.ErrAuthTokenNotProvided) {
 		return http.StatusUnauthorized
 	}
 
