@@ -22,27 +22,29 @@ type AuthLoginReq struct {
 }
 
 type AuthLoginResp struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	User         *User  `json:"user"`
+	AccessToken  string `json:"accessToken,omitempty"`
+	RefreshToken string `json:"refreshToken,omitempty"`
+	User         *User  `json:"user,omitempty"`
 }
 
 type AuthRepository interface {
 	Register(ctx context.Context, user *User) error
 	Login(ctx context.Context, email string) (*User, error)
-	SaveRefreshToken(ctx context.Context, rtk *RefreshToken) error
 	RefreshToken(ctx context.Context, claim *jwt.RegisteredClaims) (*User, *RefreshToken, error)
+	SaveRefreshToken(ctx context.Context, rtk *RefreshToken) error
 	UpdateRefreshToken(ctx context.Context, rtk *RefreshToken) error
 }
 
 type AuthUsecase interface {
 	Register(req *AuthRegisterReq) error
 	Login(req *AuthLoginReq) (*AuthLoginResp, error)
+	Logout(rtk string) error
 	RefreshToken(rtk string) (string, string, error)
 }
 
 type AuthHandler interface {
 	Register(c *gin.Context)
 	Login(c *gin.Context)
+	Logout(c *gin.Context)
 	RefreshToken(c *gin.Context)
 }

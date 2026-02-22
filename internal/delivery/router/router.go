@@ -15,7 +15,7 @@ type Handlers struct {
 func SetupRoutes(r *gin.Engine, h *Handlers, config *entity.Config) {
 	api := r.Group("/api")
 
-	// User
+	// Auth
 	{
 		api.POST("/register", h.AuthHandler.Register)
 		api.POST("/login", h.AuthHandler.Login)
@@ -23,6 +23,11 @@ func SetupRoutes(r *gin.Engine, h *Handlers, config *entity.Config) {
 	}
 
 	protected := api.Use(middleware.AuthMiddleware(config))
+
+	// Auth
+	{
+		protected.POST("/logout", h.AuthHandler.Logout)
+	}
 
 	// Blog
 	{

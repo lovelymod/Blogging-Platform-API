@@ -103,6 +103,24 @@ func (u *authUsercase) Login(req *entity.AuthLoginReq) (*entity.AuthLoginResp, e
 	}, nil
 }
 
+func (u *authUsercase) Logout(refreshToken string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
+	defer cancel()
+
+	cliams, err := utils.ParseRefreshToken(refreshToken, u.refreshTokenSecret)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	updatedRefreshTokon := &entity.RefreshToken{
+		Jti:       cliams.ID,
+		IsRevoked: true,
+	}
+
+	return u.repo.UpdateRefreshToken(ctx, updatedRefreshTokon)
+}
+
 func (u *authUsercase) RefreshToken(rtk string) (string, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()

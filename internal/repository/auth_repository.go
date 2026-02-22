@@ -56,15 +56,6 @@ func (repo *authRepository) Login(ctx context.Context, email string) (*entity.Us
 	return &existUser, nil
 }
 
-func (repo *authRepository) SaveRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {
-	if err := repo.db.WithContext(ctx).Create(rtk).Error; err != nil {
-		log.Println(err)
-		return entity.ErrGlobalServerErr
-	}
-
-	return nil
-}
-
 func (repo *authRepository) RefreshToken(ctx context.Context, claims *jwt.RegisteredClaims) (*entity.User, *entity.RefreshToken, error) {
 	var existUser entity.User
 	var existRtk entity.RefreshToken
@@ -88,6 +79,15 @@ func (repo *authRepository) RefreshToken(ctx context.Context, claims *jwt.Regist
 	}
 
 	return &existUser, &existRtk, nil
+}
+
+func (repo *authRepository) SaveRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {
+	if err := repo.db.WithContext(ctx).Create(rtk).Error; err != nil {
+		log.Println(err)
+		return entity.ErrGlobalServerErr
+	}
+
+	return nil
 }
 
 func (repo *authRepository) UpdateRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {

@@ -85,6 +85,31 @@ func (h *authHandler) Login(c *gin.Context) {
 	})
 }
 
+func (h *authHandler) Logout(c *gin.Context) {
+	refreshToken, err := c.Cookie("refreshToken")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, &entity.Resp{
+			Message: err.Error(),
+			Success: false,
+		})
+	}
+
+	if err := h.usecase.Logout(refreshToken); err != nil {
+		httpErrStatus := utils.GetHttpErrStatus(err)
+		c.JSON(httpErrStatus, &entity.Resp{
+			Message: err.Error(),
+			Success: false,
+		})
+		return
+	}
+
+	c.SetCookie("refreshToken", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, &entity.Resp{
+		Message: "logout",
+		Success: true,
+	})
+}
+
 func (h *authHandler) RefreshToken(c *gin.Context) {
 	rtk, err := c.Cookie("refreshToken")
 	if err != nil {
