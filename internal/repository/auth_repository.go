@@ -21,7 +21,7 @@ func NewAuthRepository(db *gorm.DB) entity.AuthRepository {
 	}
 }
 
-func (repo *authRepository) Register(ctx context.Context, registerUser *entity.User) error {
+func (repo *authRepository) CreateUser(ctx context.Context, registerUser *entity.User) error {
 	var count int64
 
 	if err := repo.db.WithContext(ctx).Model(&entity.User{}).Where(&entity.User{Email: registerUser.Email}).Or(&entity.User{Username: registerUser.Username}).Count(&count).Error; err != nil {
@@ -41,7 +41,7 @@ func (repo *authRepository) Register(ctx context.Context, registerUser *entity.U
 	return nil
 }
 
-func (repo *authRepository) Login(ctx context.Context, email string) (*entity.User, error) {
+func (repo *authRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var existUser entity.User
 
 	if err := repo.db.WithContext(ctx).Where(&entity.User{Email: email}).First(&existUser).Error; err != nil {
@@ -56,32 +56,23 @@ func (repo *authRepository) Login(ctx context.Context, email string) (*entity.Us
 	return &existUser, nil
 }
 
-func (repo *authRepository) RefreshToken(ctx context.Context, claims *jwt.RegisteredClaims) (*entity.User, *entity.RefreshToken, error) {
-	var existUser entity.User
+func (repo *authRepository) GetRefreshToken(ctx context.Context, claims *jwt.RegisteredClaims) (*entity.RefreshToken, error) {
 	var existRtk entity.RefreshToken
 
 	userID, _ := strconv.ParseUint(claims.Subject, 10, 64)
 
-	if err := repo.db.WithContext(ctx).Where(&entity.RefreshToken{Jti: claims.ID, UserID: uint(userID)}).First(&existRtk).Error; err != nil {
+	if err := repo.db.WithContext(ctx).Preload("User").Where(&entity.RefreshToken{Jti: claims.ID, UserID: uint(userID)}).First(&existRtk).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil, entity.ErrGlobalNotFound
+			return nil, entity.ErrGlobalNotFound
 		}
 		log.Println(err)
-		return nil, nil, entity.ErrGlobalServerErr
+		return nil, entity.ErrGlobalServerErr
 	}
 
-	if err := repo.db.WithContext(ctx).Where(&entity.User{ID: existRtk.UserID}).First(&existUser).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil, entity.ErrGlobalNotFound
-		}
-		log.Println(err)
-		return nil, nil, entity.ErrGlobalServerErr
-	}
-
-	return &existUser, &existRtk, nil
+	return &existRtk, nil
 }
 
-func (repo *authRepository) SaveRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {
+func (repo *authRepository) CreateRefreshToken(ctx context.Context, rtk *entity.RefreshToken) error {
 	if err := repo.db.WithContext(ctx).Create(rtk).Error; err != nil {
 		log.Println(err)
 		return entity.ErrGlobalServerErr

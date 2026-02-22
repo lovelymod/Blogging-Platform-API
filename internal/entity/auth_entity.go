@@ -2,10 +2,24 @@ package entity
 
 import (
 	"context"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+type RefreshToken struct {
+	ID        uint      `json:"id" gorm:"primaryKey;autoIncrement"`
+	UserID    uint      `json:"userID" gorm:"not null;index"`
+	User      User      `json:"user"`
+	Token     string    `json:"token" gorm:"not null;unique"`
+	Jti       string    `json:"jti" gorm:"not null;unique"`
+	ExpiresAt time.Time `json:"expiresAt" gorm:"not null"`
+	IsRevoked bool      `json:"isRevoked" gorm:"default:false"`
+
+	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
+}
 
 type AuthRegisterReq struct {
 	FirstName      string `json:"firstName" binding:"required"`
@@ -28,10 +42,10 @@ type AuthLoginResp struct {
 }
 
 type AuthRepository interface {
-	Register(ctx context.Context, user *User) error
-	Login(ctx context.Context, email string) (*User, error)
-	RefreshToken(ctx context.Context, claim *jwt.RegisteredClaims) (*User, *RefreshToken, error)
-	SaveRefreshToken(ctx context.Context, rtk *RefreshToken) error
+	CreateUser(ctx context.Context, user *User) error
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetRefreshToken(ctx context.Context, claim *jwt.RegisteredClaims) (*RefreshToken, error)
+	CreateRefreshToken(ctx context.Context, rtk *RefreshToken) error
 	UpdateRefreshToken(ctx context.Context, rtk *RefreshToken) error
 }
 

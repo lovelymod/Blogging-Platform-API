@@ -22,7 +22,7 @@ func AuthMiddleware(config *entity.Config) gin.HandlerFunc {
 			return
 		}
 
-		_, err := utils.ParseAccessToken(splitAtk[1], config.ACCESS_TOKEN_SECRET)
+		claims, err := utils.ParseAccessToken(splitAtk[1], config.ACCESS_TOKEN_SECRET)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Resp{
 				Message: err.Error(),
@@ -31,6 +31,7 @@ func AuthMiddleware(config *entity.Config) gin.HandlerFunc {
 			return
 		}
 
+		c.Set("userID", claims.Subject)
 		c.Next()
 	}
 }

@@ -29,22 +29,5 @@ func SetupDatabase(config *entity.Config) *gorm.DB {
 		log.Fatal("Migration Failed:", err)
 	}
 
-	// tags := []string{
-	// 	"Technology",
-	// 	"Programming",
-	// 	"Lifestyle",
-	// 	"Productivity",
-	// 	"Health & Wellness",
-	// 	"Travel",
-	// 	"Education",
-	// 	"Business",
-	// 	"Entertainment",
-	// 	"Personal Growth",
-	// }
-
-	// for _, name := range tags {
-	// 	db.FirstOrCreate(&entity.Tag{}, entity.Tag{Name: name})
-	// }
-
 	return db
 }

@@ -57,14 +57,14 @@ func (u *authUsercase) Register(req *entity.AuthRegisterReq) error {
 		user.Username = "user" + strconv.FormatInt(time.Now().Unix(), 10)
 	}
 
-	return u.repo.Register(ctx, user)
+	return u.repo.CreateUser(ctx, user)
 }
 
 func (u *authUsercase) Login(req *entity.AuthLoginReq) (*entity.AuthLoginResp, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
-	existUser, err := u.repo.Login(ctx, req.Email)
+	existUser, err := u.repo.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (u *authUsercase) Login(req *entity.AuthLoginReq) (*entity.AuthLoginResp, e
 		Jti:       claims.ID,
 	}
 
-	if err := u.repo.SaveRefreshToken(ctx, savedRtk); err != nil {
+	if err := u.repo.CreateRefreshToken(ctx, savedRtk); err != nil {
 		return nil, err
 	}
 
@@ -132,7 +132,7 @@ func (u *authUsercase) RefreshToken(rtk string) (string, string, error) {
 	}
 
 	// Get refreshToken in db
-	existUser, existRtk, err := u.repo.RefreshToken(ctx, oldClaims)
+	existRtk, err := u.repo.GetRefreshToken(ctx, oldClaims)
 	if err != nil {
 		return "", "", err
 	}
@@ -146,26 +146,26 @@ func (u *authUsercase) RefreshToken(rtk string) (string, string, error) {
 	}
 
 	// Sign new accessToken
-	newAtk, err := utils.SignAccessToken(existUser, u.accessTokenSecret)
+	newAtk, err := utils.SignAccessToken(&existRtk.User, u.accessTokenSecret)
 	if err != nil {
 		return "", "", entity.ErrGlobalServerErr
 	}
 
 	// Sign new refreshToken
-	newClaims, newRtk, err := utils.SignRefreshToken(existUser, u.refreshTokenSecret)
+	newClaims, newRtk, err := utils.SignRefreshToken(&existRtk.User, u.refreshTokenSecret)
 	if err != nil {
 		log.Println(err)
 		return "", "", entity.ErrGlobalServerErr
 	}
 
 	savedRtk := &entity.RefreshToken{
-		UserID:    existUser.ID,
+		UserID:    existRtk.UserID,
 		Token:     newRtk,
 		ExpiresAt: newClaims.ExpiresAt.Time,
 		Jti:       newClaims.ID,
 	}
 
-	if err := u.repo.SaveRefreshToken(ctx, savedRtk); err != nil {
+	if err := u.repo.CreateRefreshToken(ctx, savedRtk); err != nil {
 		return "", "", err
 	}
 

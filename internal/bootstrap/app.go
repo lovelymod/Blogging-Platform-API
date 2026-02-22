@@ -40,7 +40,7 @@ func App() Application {
 	app := &Application{
 		Config: config,
 	}
-	app.DB = SetupDatabase(config) // เรียกฟังก์ชันจาก database.go
+	app.DB = SetupDatabase(config)
 
 	app.Cors = cors.Default()
 	return *app

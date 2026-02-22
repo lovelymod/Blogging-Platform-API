@@ -92,6 +92,7 @@ func (h *authHandler) Logout(c *gin.Context) {
 			Message: err.Error(),
 			Success: false,
 		})
+		return
 	}
 
 	if err := h.usecase.Logout(refreshToken); err != nil {
